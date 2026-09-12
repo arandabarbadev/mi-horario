@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi horario</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Mi horario</h1>
+      <p class="subtitulo" id="fecha-hoy"></p>
+    </header>
+
+    <!-- Pestañas para elegir el día -->
+    <nav class="dias" id="dias" aria-label="Elegir día"></nav>
+
+    <main>
+      <!-- Día de entre semana: clases + cosas por la tarde -->
+      <section id="seccion-horario" class="tarjeta">
+        <h2 id="titulo-dia"></h2>
+
+        <div class="bloque">
+          <h3>Clases</h3>
+          <ul id="lista-clases" class="lista"></ul>
+          <form id="form-clases" class="form-fila">
+            <input type="time" id="hora-clases" aria-label="Hora de clase" required>
+            <input type="text" id="texto-clases" aria-label="Asignatura o actividad"
+                   placeholder="Asignatura o actividad" maxlength="60" autocomplete="off" required>
+            <button type="submit" class="boton">Añadir</button>
+          </form>
+        </div>
+
+        <div class="bloque">
+          <h3>Por la tarde</h3>
+          <ul id="lista-tarde" class="lista"></ul>
+          <form id="form-tarde" class="form-fila">
+            <input type="time" id="hora-tarde" aria-label="Hora de la tarde" required>
+            <input type="text" id="texto-tarde" aria-label="Cosa que hacer por la tarde"
+                   placeholder="Cosa que hacer" maxlength="60" autocomplete="off" required>
+            <button type="submit" class="boton">Añadir</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Tareas pendientes (sábado y domingo) -->
+      <section id="seccion-tareas" class="tarjeta oculto">
+        <h2 id="titulo-tareas">Tareas pendientes</h2>
+        <p class="sugerencia">Las mismas tareas se muestran el sábado y el domingo.</p>
+        <ul id="lista-tareas" class="lista"></ul>
+        <form id="form-tareas" class="form-fila">
+          <input type="text" id="tarea-nueva" aria-label="Nueva tarea"
+                 placeholder="Tarea pendiente…" maxlength="80" autocomplete="off" required>
+          <button type="submit" class="boton">Añadir</button>
+        </form>
+        <button id="quitar-hechas" class="enlace oculto" type="button">Quitar tareas hechas</button>
+      </section>
+    </main>
+
+    <footer>Tus datos se guardan solo en este navegador.</footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
