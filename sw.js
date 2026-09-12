@@ -1,12 +1,13 @@
 // Service worker: guarda los archivos de la web para que
 // "Mi horario" funcione como una app y también sin conexión.
 
-const CACHE = 'mi-horario-v1';
+const CACHE = 'mi-horario-v2';
 const ARCHIVOS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './sincronizar.js',
   './manifest.webmanifest',
   './icono-192.png',
   './icono-512.png',

@@ -13,8 +13,12 @@
 <body>
   <div class="app">
     <header>
-      <h1>Mi horario</h1>
-      <p class="subtitulo" id="fecha-hoy"></p>
+      <div class="titulo">
+        <h1>Mi horario</h1>
+        <p class="subtitulo" id="fecha-hoy"></p>
+      </div>
+      <button id="boton-ajustes" class="boton-ajustes" type="button"
+              aria-label="Ajustes de sincronización" title="Sincronizar móvil y ordenador">⚙️</button>
     </header>
 
     <!-- Pestañas para elegir el día -->
@@ -62,9 +66,34 @@
       </section>
     </main>
 
-    <footer>Tus datos se guardan solo en este navegador.</footer>
+    <!-- Sincronización entre móvil y ordenador -->
+    <section id="ajustes" class="tarjeta oculto">
+      <h2>Sincronizar</h2>
+      <p class="sugerencia">Guarda tus datos cifrados dentro de tu repo de GitHub, así los tienes igual en el móvil y en el ordenador.</p>
+      <form id="form-ajustes" class="form-ajustes">
+        <label for="token">Token de GitHub</label>
+        <input type="password" id="token" placeholder="github_pat_…" autocomplete="off">
+        <label for="contrasena">Contraseña de cifrado</label>
+        <input type="password" id="contrasena" placeholder="La misma en todos tus dispositivos" autocomplete="new-password">
+        <button type="submit" class="boton">Guardar y sincronizar</button>
+      </form>
+      <p id="estado-sync" class="sugerencia"></p>
+      <details class="ayuda-token">
+        <summary>¿Cómo consigo el token?</summary>
+        <ol>
+          <li>En GitHub: tu foto → <strong>Settings</strong> → <strong>Developer settings</strong> → <strong>Personal access tokens → Fine-grained tokens</strong></li>
+          <li><strong>Generate new token</strong> → en Repository access elige <strong>Only select repositories → mi-horario</strong></li>
+          <li>En Permissions → Repository permissions → <strong>Contents: Read and write</strong></li>
+          <li>Genera y copia el código (empieza por <code>github_pat_</code>)</li>
+        </ol>
+        <p>El token solo puede tocar este repo, y tus datos van cifrados con tu contraseña: nadie más puede leerlos. No compartas ninguno de los dos.</p>
+      </details>
+    </section>
+
+    <footer>Tus datos se guardan en este navegador y, con la sincronización activada, cifrados en GitHub.</footer>
   </div>
 
   <script src="app.js"></script>
+  <script src="sincronizar.js"></script>
 </body>
 </html>

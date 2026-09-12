@@ -314,6 +314,79 @@ footer {
 
 .oculto { display: none; }
 
+/* Cabecera con el botón de ajustes */
+header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.boton-ajustes {
+  border: none;
+  background: none;
+  padding: 6px 8px;
+  font-size: 1.2rem;
+  color: var(--suave);
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.boton-ajustes:hover {
+  color: var(--texto);
+  background: var(--tarjeta);
+}
+
+/* Panel de sincronización */
+.form-ajustes {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.form-ajustes label {
+  margin-top: 10px;
+  font-family: var(--fuente-titulo);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--suave);
+}
+
+#ajustes input[type="password"] {
+  padding: 10px 12px;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+#ajustes input[type="password"]:focus {
+  outline: 2px solid var(--acento);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+#estado-sync {
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.ayuda-token {
+  margin-top: 12px;
+  color: var(--suave);
+  font-size: 0.85rem;
+}
+
+.ayuda-token summary {
+  cursor: pointer;
+  color: var(--texto);
+}
+
+.ayuda-token ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
 /* Ordenador: más espacio y texto algo más grande */
 @media (min-width: 700px) {
   .app {

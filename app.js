@@ -1,7 +1,8 @@
 // ===== Mi horario =====
 // De lunes a viernes: clases + cosas que hacer por la tarde.
 // Sábado y domingo: tareas pendientes.
-// Todo se guarda en el navegador (localStorage), sin cuentas ni servidores.
+// Los datos se guardan en el navegador (localStorage) y, si activas
+// la sincronización en ⚙️, también cifrados en GitHub (ver sincronizar.js).
 
 const DIAS = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 const CORTOS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
@@ -22,7 +23,7 @@ const TIPOS = [
 
 function datosVacios() {
   const dia = { clases: [], tarde: [] };
-  return { horario: Object.fromEntries(DIAS.map(d => [d, dia])), tareas: [] };
+  return { horario: Object.fromEntries(DIAS.map(d => [d, dia])), tareas: [], modificado: 0 };
 }
 
 function cargar() {
@@ -43,6 +44,7 @@ function cargar() {
         }
       });
       if (Array.isArray(guardado.tareas)) datos.tareas = guardado.tareas;
+      datos.modificado = guardado.modificado || 0;
     }
   } catch {
     // Si los datos guardados están rotos, se empieza de cero
@@ -51,7 +53,13 @@ function cargar() {
 }
 
 const datos = cargar();
-const guardar = () => localStorage.setItem(CLAVE, JSON.stringify(datos));
+
+function guardar() {
+  datos.modificado = Date.now(); // cuándo se cambió por última vez (para sincronizar)
+  localStorage.setItem(CLAVE, JSON.stringify(datos));
+  if (typeof programarSubida === 'function') programarSubida();
+}
+
 const idNuevo = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
 // ---------- Ayudas para crear elementos ----------
