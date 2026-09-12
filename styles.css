@@ -314,6 +314,19 @@ footer {
 
 .oculto { display: none; }
 
+/* Mensaje de estado de la sincronización, bajo el título */
+.estado-global {
+  margin: 10px 0 0;
+  min-height: 1.1em;
+  font-size: 0.8rem;
+  color: var(--suave);
+}
+
+.estado-global.mal {
+  color: var(--acento);
+  font-weight: 600;
+}
+
 /* Cabecera con el botón de ajustes */
 header {
   display: flex;

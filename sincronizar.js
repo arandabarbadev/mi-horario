@@ -86,11 +86,19 @@ async function subirADatosJson(textoPlano) {
     Accept: 'application/vnd.github+json',
   };
 
+  // Traducir los códigos de error de GitHub a humano
+  const respuestaAmable = codigo => {
+    if (codigo === 401) return 'el token no es válido: cópialo entero, desde github_pat_…';
+    if (codigo === 403) return 'el token no tiene permiso: en el token, Permissions → Contents → Read and write';
+    if (codigo === 404) return 'el token no ve este repo: en el token, Repository access → Only select repositories → mi-horario';
+    return 'GitHub respondió ' + codigo;
+  };
+
   // GitHub pide el "sha" del archivo actual para dejarlo sobrescribir
   let sha = null;
   const actual = await fetch(URL_API, { headers: cabeceras });
   if (actual.ok) sha = (await actual.json()).sha;
-  else if (actual.status !== 404) throw new Error('GitHub respondió ' + actual.status);
+  else if (actual.status !== 404) throw new Error(respuestaAmable(actual.status));
 
   const respuesta = await fetch(URL_API, {
     method: 'PUT',
@@ -101,7 +109,7 @@ async function subirADatosJson(textoPlano) {
       ...(sha ? { sha } : {}),
     }),
   });
-  if (!respuesta.ok) throw new Error('GitHub respondió ' + respuesta.status);
+  if (!respuesta.ok) throw new Error(respuestaAmable(respuesta.status));
 }
 
 async function bajarDatosJson() {
@@ -126,7 +134,11 @@ function programarSubida() {
 
 async function subirCambios() {
   const { token, contraseña } = leerAjustes();
-  if (!token || !contraseña || ocupado) return;
+  if (ocupado) return;
+  if (!token || !contraseña) {
+    estado('ℹ️ Sin sincronizar: falta el token o la contraseña en ⚙️');
+    return;
+  }
   ocupado = true;
   try {
     const paquete = await cifrar({ horario: datos.horario, tareas: datos.tareas }, contraseña);
@@ -179,9 +191,16 @@ async function sincronizarAhora() {
 
 // ---------- Panel de ajustes ----------
 
+// El mensaje se muestra dentro del panel ⚙️ y también en una línea
+// debajo del título, para que nunca pase desapercibido
 function estado(texto) {
-  const caja = document.getElementById('estado-sync');
-  if (caja) caja.textContent = texto;
+  const panel = document.getElementById('estado-sync');
+  if (panel) panel.textContent = texto;
+  const global = document.getElementById('estado-global');
+  if (global) {
+    global.textContent = texto;
+    global.className = texto.startsWith('⚠️') ? 'estado-global mal' : 'estado-global';
+  }
 }
 
 document.getElementById('boton-ajustes').addEventListener('click', () => {
