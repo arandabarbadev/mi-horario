@@ -261,5 +261,11 @@ document.getElementById('quitar-hechas').addEventListener('click', () => {
   dibujarTareas();
 });
 
+// Registrar el service worker: así la web se instala como app
+// y funciona incluso sin conexión (en el PC con el archivo suelto no hace falta)
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('./sw.js');
+}
+
 // ¡Empieza la carrera!
 dibujar();
