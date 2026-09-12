@@ -79,7 +79,7 @@ function textoABase64Github(texto) {
   return btoa(unescape(encodeURIComponent(texto)));
 }
 
-async function subirADatosJson(textoPlano) {
+async function subirADatosJson(textoPlano, nuestroModificado) {
   const { token } = leerAjustes();
   const cabeceras = {
     Authorization: `Bearer ${token}`,
@@ -94,11 +94,25 @@ async function subirADatosJson(textoPlano) {
     return 'GitHub respondió ' + codigo;
   };
 
-  // GitHub pide el "sha" del archivo actual para dejarlo sobrescribir
+  // Antes de subir: mirar qué hay en GitHub. Necesitamos su "sha"
+  // (para que GitHub deje sobrescribir) y sabremos si sus datos son más nuevos
   let sha = null;
+  let remotoModificado = 0;
   const actual = await fetch(URL_API, { headers: cabeceras });
-  if (actual.ok) sha = (await actual.json()).sha;
-  else if (actual.status !== 404) throw new Error(respuestaAmable(actual.status));
+  if (actual.ok) {
+    const info = await actual.json();
+    sha = info.sha;
+    try {
+      remotoModificado = JSON.parse(atob(info.content.replace(/\s/g, ''))).modificado || 0;
+    } catch {
+      // si el archivo de GitHub está raro, lo tratamos como vacío
+    }
+  } else if (actual.status !== 404) {
+    throw new Error(respuestaAmable(actual.status));
+  }
+
+  // Regla de oro: NUNCA pisar datos más nuevos que los nuestros
+  if (remotoModificado >= nuestroModificado) return false;
 
   const respuesta = await fetch(URL_API, {
     method: 'PUT',
@@ -110,6 +124,7 @@ async function subirADatosJson(textoPlano) {
     }),
   });
   if (!respuesta.ok) throw new Error(respuestaAmable(respuesta.status));
+  return true;
 }
 
 async function bajarDatosJson() {
@@ -144,9 +159,18 @@ async function subirCambios() {
   ocupado = true;
   try {
     const paquete = await cifrar({ horario: datos.horario, tareas: datos.tareas }, contraseña);
-    await subirADatosJson(JSON.stringify({ modificado: datos.modificado, ...paquete }));
-    ultimaSubidaExitosa = datos.modificado;
-    estado('✅ Sincronizado a las ' + new Date().toLocaleTimeString('es-ES'));
+    const subido = await subirADatosJson(
+      JSON.stringify({ modificado: datos.modificado, ...paquete }),
+      datos.modificado,
+    );
+    if (subido) {
+      ultimaSubidaExitosa = datos.modificado;
+      estado('✅ Sincronizado a las ' + new Date().toLocaleTimeString('es-ES'));
+    } else {
+      // En GitHub había algo más nuevo: bajárnoslo en vez de pisarlo
+      estado('ℹ️ En GitHub hay datos más nuevos: bajándolos…');
+      await sincronizarAlIniciar();
+    }
   } catch (error) {
     estado('⚠️ No se pudo sincronizar: ' + error.message);
   } finally {
