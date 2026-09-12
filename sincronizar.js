@@ -130,7 +130,7 @@ let ultimaSubidaExitosa = 0; // para no subir dos veces lo mismo
 // espera 15 segundos por si haces más cambios y entonces sube
 function programarSubida() {
   clearTimeout(temporizador);
-  temporizador = setTimeout(subirCambios, 15000);
+  temporizador = setTimeout(subirCambios, 8000);
 }
 
 async function subirCambios() {
@@ -235,7 +235,11 @@ function sePuedeActualizarSolo() {
 }
 
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && sePuedeActualizarSolo()) sincronizarAlIniciar();
+  if (document.hidden) {
+    subirCambios(); // al salir de la app: subir ya lo nuevo, sin esperar
+  } else if (sePuedeActualizarSolo()) {
+    sincronizarAlIniciar();
+  }
 });
 
 setInterval(() => {
