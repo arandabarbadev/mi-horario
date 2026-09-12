@@ -124,6 +124,7 @@ async function bajarDatosJson() {
 
 let temporizador = null;
 let ocupado = false;
+let ultimaSubidaExitosa = 0; // para no subir dos veces lo mismo
 
 // app.js llama a esto cada vez que cambian los datos:
 // espera 15 segundos por si haces más cambios y entonces sube
@@ -139,10 +140,12 @@ async function subirCambios() {
     estado('ℹ️ Sin sincronizar: falta el token o la contraseña en ⚙️');
     return;
   }
+  if (datos.modificado <= ultimaSubidaExitosa) return; // ya está subido
   ocupado = true;
   try {
     const paquete = await cifrar({ horario: datos.horario, tareas: datos.tareas }, contraseña);
     await subirADatosJson(JSON.stringify({ modificado: datos.modificado, ...paquete }));
+    ultimaSubidaExitosa = datos.modificado;
     estado('✅ Sincronizado a las ' + new Date().toLocaleTimeString('es-ES'));
   } catch (error) {
     estado('⚠️ No se pudo sincronizar: ' + error.message);
@@ -165,6 +168,7 @@ async function sincronizarAlIniciar() {
     datos.horario = nuevo.horario;
     datos.tareas = nuevo.tareas;
     datos.modificado = remoto.modificado;
+    ultimaSubidaExitosa = remoto.modificado; // lo que bajo no hace falta subirlo
     localStorage.setItem(CLAVE, JSON.stringify(datos));
     dibujar();
     estado('✅ Datos actualizados desde GitHub');
@@ -222,6 +226,21 @@ document.getElementById('form-ajustes').addEventListener('submit', evento => {
   estado('Ajustes guardados. Sincronizando…');
   sincronizarAhora();
 });
+
+// Mantenerse al día: mirar si GitHub tiene algo nuevo al volver a mirar
+// la pestaña (o la app) y cada 60 segundos mientras esté abierta
+function sePuedeActualizarSolo() {
+  const escribiendo = document.activeElement && document.activeElement.tagName === 'INPUT';
+  return !document.querySelector('.form-editar') && !escribiendo;
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && sePuedeActualizarSolo()) sincronizarAlIniciar();
+});
+
+setInterval(() => {
+  if (sePuedeActualizarSolo()) sincronizarAlIniciar();
+}, 60000);
 
 // Al arrancar la web, mirar si GitHub tiene algo más nuevo
 sincronizarAlIniciar();
