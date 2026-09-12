@@ -195,7 +195,7 @@ async function sincronizarAlIniciar() {
     ultimaSubidaExitosa = remoto.modificado; // lo que bajo no hace falta subirlo
     localStorage.setItem(CLAVE, JSON.stringify(datos));
     dibujar();
-    estado('✅ Datos actualizados desde GitHub');
+    estado('✅ Datos actualizados desde GitHub a las ' + new Date().toLocaleTimeString('es-ES'));
   } catch (error) {
     if (error.name === 'OperationError') {
       estado('⚠️ La contraseña no coincide con los datos guardados en GitHub');
@@ -252,7 +252,7 @@ document.getElementById('form-ajustes').addEventListener('submit', evento => {
 });
 
 // Mantenerse al día: mirar si GitHub tiene algo nuevo al volver a mirar
-// la pestaña (o la app) y cada 60 segundos mientras esté abierta
+// la pestaña (o la app) y cada 15 segundos mientras esté abierta
 function sePuedeActualizarSolo() {
   const escribiendo = document.activeElement && document.activeElement.tagName === 'INPUT';
   return !document.querySelector('.form-editar') && !escribiendo;
@@ -268,7 +268,7 @@ document.addEventListener('visibilitychange', () => {
 
 setInterval(() => {
   if (sePuedeActualizarSolo()) sincronizarAlIniciar();
-}, 60000);
+}, 15000);
 
 // Al arrancar la web, mirar si GitHub tiene algo más nuevo
 sincronizarAlIniciar();
